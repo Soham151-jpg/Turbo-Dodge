@@ -1,0 +1,6 @@
+{
+  "name": "Turbo Dodge",
+  "description": "High-speed retro arcade car dodging game with power-ups, screen shake, particles, sound effects, high score persistence, and mobile touch controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
