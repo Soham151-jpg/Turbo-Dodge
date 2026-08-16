@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameStats, GameState, POWERUPS } from '../types';
-import { Volume2, VolumeX, Pause, Play, Heart, Coins, ShoppingBag } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, Heart, Coins, ShoppingBag, Trophy } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
 
 interface HUDProps {
@@ -10,6 +10,8 @@ interface HUDProps {
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
   onOpenShop: () => void;
+  onOpenAchievements: () => void;
+  unclaimedAchievementsCount?: number;
 }
 
 export const HUD: React.FC<HUDProps> = ({
@@ -19,6 +21,8 @@ export const HUD: React.FC<HUDProps> = ({
   isMuted,
   setIsMuted,
   onOpenShop,
+  onOpenAchievements,
+  unclaimedAchievementsCount = 0,
 }) => {
   const toggleMute = () => {
     const muted = soundEngine.toggleMute();
@@ -75,8 +79,8 @@ export const HUD: React.FC<HUDProps> = ({
         </div>
       </div>
 
-      {/* Health Hearts, Shop Button & Quick Controls */}
-      <div className="flex items-center gap-2">
+      {/* Health Hearts, Achievements, Shop & Quick Controls */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         <div className="flex items-center gap-0.5 mr-0.5">
           {[0, 1, 2].map((idx) => (
             <Heart
@@ -90,10 +94,22 @@ export const HUD: React.FC<HUDProps> = ({
           ))}
         </div>
 
+        {/* Achievements Button */}
+        <button
+          onClick={onOpenAchievements}
+          className="relative p-1.5 rounded-lg bg-neutral-900 border border-amber-500/40 hover:border-amber-400 text-yellow-400 hover:text-yellow-300 transition active:scale-95 flex items-center gap-1 shadow-[0_0_8px_rgba(245,158,11,0.15)] cursor-pointer"
+          title="Open Achievements & Lifetime Stats"
+        >
+          <Trophy className="w-4 h-4" />
+          {unclaimedAchievementsCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 border border-neutral-950 animate-ping" />
+          )}
+        </button>
+
         {/* Garage / Shop Button */}
         <button
           onClick={onOpenShop}
-          className="p-1.5 rounded-lg bg-neutral-900 border border-yellow-500/40 hover:border-yellow-400 text-yellow-400 hover:text-yellow-300 transition active:scale-95 flex items-center gap-1 shadow-[0_0_8px_rgba(234,179,8,0.15)]"
+          className="p-1.5 rounded-lg bg-neutral-900 border border-yellow-500/40 hover:border-yellow-400 text-yellow-400 hover:text-yellow-300 transition active:scale-95 flex items-center gap-1 shadow-[0_0_8px_rgba(234,179,8,0.15)] cursor-pointer"
           title="Open Car Garage & Shop"
         >
           <ShoppingBag className="w-4 h-4" />
@@ -102,7 +118,7 @@ export const HUD: React.FC<HUDProps> = ({
         {/* Audio Toggle */}
         <button
           onClick={toggleMute}
-          className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition active:scale-95"
+          className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition active:scale-95 cursor-pointer"
           title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
         >
           {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
@@ -112,7 +128,7 @@ export const HUD: React.FC<HUDProps> = ({
         {gameState === GameState.PLAY || gameState === GameState.PAUSED ? (
           <button
             onClick={togglePause}
-            className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-yellow-400 hover:text-yellow-300 transition active:scale-95"
+            className="p-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-yellow-400 hover:text-yellow-300 transition active:scale-95 cursor-pointer"
             title="Pause Game"
           >
             {gameState === GameState.PAUSED ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
@@ -122,4 +138,3 @@ export const HUD: React.FC<HUDProps> = ({
     </div>
   );
 };
-

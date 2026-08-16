@@ -444,6 +444,144 @@ export interface Particle {
   draw(ctx: CanvasRenderingContext2D): void;
 }
 
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  target: number;
+  rewardCoins: number;
+  category: 'score' | 'coins' | 'garage' | 'skill' | 'general';
+}
+
+export interface PlayerProfile {
+  totalCoins: number;
+  lifetimeCoins: number;
+  bestScore: number;
+  gamesPlayed: number;
+  totalNearMisses: number;
+  totalShieldsCollected: number;
+  totalSlowsCollected: number;
+  unlockedCars: string[];
+  selectedCarId: string;
+  unlockedAchievements: string[];
+  claimedAchievements: string[];
+  cameraMode: 'chase' | 'hood' | 'retro';
+  audioMuted: boolean;
+  lastSaved?: number;
+}
+
+export const ACHIEVEMENTS: Achievement[] = [
+  {
+    id: 'first_race',
+    title: 'First Ignition',
+    description: 'Start and complete your very first highway race.',
+    icon: '🏎️',
+    target: 1,
+    rewardCoins: 25,
+    category: 'general',
+  },
+  {
+    id: 'veteran_racer',
+    title: 'Highway Veteran',
+    description: 'Play 10 total race sessions.',
+    icon: '🏁',
+    target: 10,
+    rewardCoins: 100,
+    category: 'general',
+  },
+  {
+    id: 'coins_50',
+    title: 'Coin Collector',
+    description: 'Collect a lifetime total of 50 gold coins.',
+    icon: '🪙',
+    target: 50,
+    rewardCoins: 50,
+    category: 'coins',
+  },
+  {
+    id: 'coins_200',
+    title: 'Gold Vault',
+    description: 'Collect a lifetime total of 200 gold coins.',
+    icon: '💰',
+    target: 200,
+    rewardCoins: 150,
+    category: 'coins',
+  },
+  {
+    id: 'score_1000',
+    title: 'Speedy Cruiser',
+    description: 'Reach 1,000 points in a single race.',
+    icon: '⚡',
+    target: 1000,
+    rewardCoins: 50,
+    category: 'score',
+  },
+  {
+    id: 'score_3000',
+    title: 'Highway Menace',
+    description: 'Reach 3,000 points in a single race.',
+    icon: '🔥',
+    target: 3000,
+    rewardCoins: 150,
+    category: 'score',
+  },
+  {
+    id: 'score_5000',
+    title: 'Arcade Legend',
+    description: 'Reach 5,000 points in a single race.',
+    icon: '👑',
+    target: 5000,
+    rewardCoins: 300,
+    category: 'score',
+  },
+  {
+    id: 'near_miss_25',
+    title: 'Danger Zone',
+    description: 'Perform 25 high-speed close pass near misses.',
+    icon: '🎯',
+    target: 25,
+    rewardCoins: 75,
+    category: 'skill',
+  },
+  {
+    id: 'shields_10',
+    title: 'Shield Master',
+    description: 'Collect 10 kinetic shield power-ups.',
+    icon: '🛡️',
+    target: 10,
+    rewardCoins: 50,
+    category: 'skill',
+  },
+  {
+    id: 'slows_10',
+    title: 'Chrono Bender',
+    description: 'Collect 10 chrono slow-mo warps.',
+    icon: '⏱️',
+    target: 10,
+    rewardCoins: 50,
+    category: 'skill',
+  },
+  {
+    id: 'cars_3',
+    title: 'Car Enthusiast',
+    description: 'Unlock 3 vehicles in your garage.',
+    icon: '🚘',
+    target: 3,
+    rewardCoins: 100,
+    category: 'garage',
+  },
+  {
+    id: 'cars_6',
+    title: 'Garage Tycoon',
+    description: 'Unlock 6 vehicles in your garage.',
+    icon: '🌟',
+    target: 6,
+    rewardCoins: 250,
+    category: 'garage',
+  },
+];
+
 export interface GameStats {
   score: number;
   bestScore: number;

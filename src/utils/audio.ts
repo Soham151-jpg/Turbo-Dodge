@@ -1046,6 +1046,34 @@ class SoundEngine {
     osc.start(now);
     osc.stop(now + 0.3);
   }
+
+  // Achievement unlock triumphant fanfare
+  public playAchievement() {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    // Fast ascending celebratory arpeggio: C5 -> E5 -> G5 -> C6 -> E6 -> G6
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98];
+    notes.forEach((freq, idx) => {
+      if (!this.ctx) return;
+      const startTime = this.ctx.currentTime + idx * 0.055;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = idx === notes.length - 1 ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(freq, startTime);
+
+      gain.gain.setValueAtTime(0.22, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.005, startTime + (idx === notes.length - 1 ? 0.6 : 0.25));
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + (idx === notes.length - 1 ? 0.65 : 0.3));
+    });
+  }
 }
 
 export const soundEngine = new SoundEngine();

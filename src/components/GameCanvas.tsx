@@ -8,6 +8,8 @@ import {
   PowerUpType,
   CAR_SKINS,
   CarSkin,
+  Achievement,
+  ACHIEVEMENTS,
 } from '../types';
 import { soundEngine } from '../utils/audio';
 import { gameStorage } from '../utils/storage';
@@ -56,6 +58,7 @@ interface GameCanvasProps {
   selectedCarId: string;
   totalCoins: number;
   setTotalCoins: React.Dispatch<React.SetStateAction<number>>;
+  onAchievementUnlocked?: (achievement: Achievement) => void;
 }
 
 export const GameCanvas: React.FC<GameCanvasProps> = ({
@@ -66,6 +69,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   selectedCarId,
   totalCoins,
   setTotalCoins,
+  onAchievementUnlocked,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const keysRef = useRef<{ [key: string]: boolean }>({});
@@ -77,6 +81,9 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
   const selectedCarRef = useRef<string>(selectedCarId);
   selectedCarRef.current = selectedCarId;
+
+  const onAchievementUnlockedRef = useRef(onAchievementUnlocked);
+  onAchievementUnlockedRef.current = onAchievementUnlocked;
 
   const [camMode, setCamMode] = useState<CameraViewMode>(() => gameStorage.getProfile().cameraMode);
   const camModeRef = useRef<CameraViewMode>(camMode);
@@ -334,6 +341,23 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
     let powerupSpawnInterval = 6.5;
     let coinTimer = 0;
     let coinSpawnInterval = 1.6;
+    let hasIncrementedGamesPlayed = false;
+
+    function checkNewlyUnlockedAchievements() {
+      const prof = gameStorage.getProfile();
+      const newly = gameStorage.evaluateAchievements(prof);
+      if (newly.length > 0) {
+        newly.forEach((id) => {
+          const ach = ACHIEVEMENTS.find((a) => a.id === id);
+          if (ach) {
+            soundEngine.playAchievement();
+            if (onAchievementUnlockedRef.current) {
+              onAchievementUnlockedRef.current(ach);
+            }
+          }
+        });
+      }
+    }
 
     // Player 3D Vehicle
     let currentCarSkin = CAR_SKINS.find((c) => c.id === selectedCarRef.current) || CAR_SKINS[0];
@@ -509,10 +533,17 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
       // --- GAMEPLAY UPDATE WHEN PLAYING ---
       if (gameState === GameState.PLAY) {
+        if (!hasIncrementedGamesPlayed) {
+          hasIncrementedGamesPlayed = true;
+          gameStorage.incrementGamesPlayed();
+          checkNewlyUnlockedAchievements();
+        }
+
         // Scoring & Level progression
         score += Math.round(dt * 60);
         if (score > bestScore) {
           bestScore = gameStorage.saveBestScore(score);
+          checkNewlyUnlockedAchievements();
         }
         level = Math.floor(score / 500) + 1;
         const targetSpeed = baseSpeed + (level - 1) * 3.5;
@@ -675,6 +706,8 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
             cameraShake = 0.35;
             soundEngine.playNearMiss(selectedCarRef.current);
             createFloatingText3D('+25 NEAR MISS!', player.x, 1.2, 0, '#38bdf8');
+            gameStorage.recordNearMiss();
+            checkNewlyUnlockedAchievements();
           }
 
           // Crash Collision Check
@@ -740,6 +773,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
             const updatedTotal = gameStorage.addCoins(earnedCoins);
             totalCoinsRef.current = updatedTotal;
             setTotalCoins(updatedTotal);
+            checkNewlyUnlockedAchievements();
           } else if (c.z < -20) {
             scene.remove(c.mesh);
             coins3D.splice(i, 1);
@@ -761,11 +795,14 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
               player.shieldTimer = POWERUPS.shield.duration;
               soundEngine.playPowerup('shield');
               createFloatingText3D('SHIELD ACTIVE! 🛡️', player.x, 1.5, 0, '#00e5ff');
+              gameStorage.recordShieldCollected();
             } else {
               slowTimer = POWERUPS.slow.duration;
               soundEngine.playPowerup('slow');
               createFloatingText3D('TIME WARP! ⏱️', player.x, 1.5, 0, '#ff8c00');
+              gameStorage.recordSlowCollected();
             }
+            checkNewlyUnlockedAchievements();
             createSparkBurst(p.x, 1.2, p.z, 20, p.type === 'shield' ? 0x00e5ff : 0xff8c00);
             scene.remove(p.group);
             powerups3D.splice(i, 1);

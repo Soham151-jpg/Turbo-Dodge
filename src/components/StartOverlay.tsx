@@ -1,6 +1,6 @@
 import React from 'react';
-import { GameState, CAR_SKINS } from '../types';
-import { Play, Shield, Timer, Keyboard, ShoppingBag, Coins, Trophy } from 'lucide-react';
+import { GameState, CAR_SKINS, PlayerProfile } from '../types';
+import { Play, Shield, Timer, Keyboard, ShoppingBag, Coins, Trophy, Sparkles } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
 import { gameStorage } from '../utils/storage';
 import { VehicleSprite } from './VehicleSprite';
@@ -8,17 +8,20 @@ import { VehicleSprite } from './VehicleSprite';
 interface StartOverlayProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   onOpenShop: () => void;
+  onOpenAchievements: () => void;
   totalCoins: number;
   selectedCarId: string;
+  profile: PlayerProfile;
 }
 
 export const StartOverlay: React.FC<StartOverlayProps> = ({
   setGameState,
   onOpenShop,
+  onOpenAchievements,
   totalCoins,
   selectedCarId,
+  profile,
 }) => {
-  const profile = gameStorage.getProfile();
   const handleStart = () => {
     soundEngine.playStart();
     setGameState(GameState.PLAY);
@@ -36,6 +39,9 @@ export const StartOverlay: React.FC<StartOverlayProps> = ({
   }, []);
 
   const equippedCar = CAR_SKINS.find((c) => c.id === selectedCarId) || CAR_SKINS[0];
+  const claimableCount = profile.unlockedAchievements.filter(
+    (id) => !profile.claimedAchievements.includes(id)
+  ).length;
 
   return (
     <div className="absolute inset-0 bg-neutral-950/90 backdrop-blur-md z-20 flex flex-col items-center justify-center p-3 text-center select-none font-mono overflow-y-auto">
@@ -72,11 +78,11 @@ export const StartOverlay: React.FC<StartOverlayProps> = ({
             <VehicleSprite skin={equippedCar} size="md" animated={true} />
           </div>
 
-          {/* Quick Buttons: Sound test & Garage */}
+          {/* Quick Buttons: Sound test, Garage & Achievements */}
           <div className="mt-1 w-full flex gap-1.5">
             <button
               onClick={() => soundEngine.playCarSignature(equippedCar.id)}
-              className="py-1.5 px-2.5 bg-neutral-800 hover:bg-neutral-700 text-yellow-400 border border-yellow-500/30 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition active:scale-95 shadow-md"
+              className="py-1.5 px-2 bg-neutral-800 hover:bg-neutral-700 text-yellow-400 border border-yellow-500/30 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition active:scale-95 shadow-md cursor-pointer"
               title={`Test ${equippedCar.name} Sound Effect`}
             >
               <span>🔊</span>
@@ -84,10 +90,22 @@ export const StartOverlay: React.FC<StartOverlayProps> = ({
             </button>
             <button
               onClick={onOpenShop}
-              className="flex-1 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-yellow-400 hover:text-yellow-300 border border-yellow-500/30 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow-md"
+              className="flex-1 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-yellow-400 hover:text-yellow-300 border border-yellow-500/30 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition active:scale-95 shadow-md cursor-pointer"
             >
               <ShoppingBag className="w-3.5 h-3.5" />
-              <span>GARAGE &amp; SHOP</span>
+              <span>GARAGE</span>
+            </button>
+            <button
+              onClick={onOpenAchievements}
+              className="relative flex-1 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-amber-300 hover:text-yellow-300 border border-amber-500/40 rounded-lg text-[11px] font-bold flex items-center justify-center gap-1 transition active:scale-95 shadow-md cursor-pointer"
+            >
+              <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+              <span>TROPHIES</span>
+              {claimableCount > 0 && (
+                <span className="absolute -top-1 -right-1 px-1 py-0.2 rounded-full bg-red-500 text-[9px] font-black text-white">
+                  {claimableCount}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -137,5 +155,3 @@ export const StartOverlay: React.FC<StartOverlayProps> = ({
     </div>
   );
 };
-
-
