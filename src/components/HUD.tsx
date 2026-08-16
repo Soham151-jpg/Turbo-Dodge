@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameStats, GameState, POWERUPS } from '../types';
-import { Volume2, VolumeX, Pause, Play, Heart } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, Heart, Coins, ShoppingBag } from 'lucide-react';
 import { soundEngine } from '../utils/audio';
 
 interface HUDProps {
@@ -9,6 +9,7 @@ interface HUDProps {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
+  onOpenShop: () => void;
 }
 
 export const HUD: React.FC<HUDProps> = ({
@@ -17,6 +18,7 @@ export const HUD: React.FC<HUDProps> = ({
   setGameState,
   isMuted,
   setIsMuted,
+  onOpenShop,
 }) => {
   const toggleMute = () => {
     const muted = soundEngine.toggleMute();
@@ -38,14 +40,20 @@ export const HUD: React.FC<HUDProps> = ({
 
   return (
     <div className="w-full bg-neutral-950/90 backdrop-blur border-b border-neutral-800 px-3 py-2 text-white font-mono flex items-center justify-between shadow-lg">
-      {/* Score & Best */}
+      {/* Score & Coins */}
       <div className="flex flex-col">
         <span className="text-sm sm:text-base font-bold text-white tracking-wider">
           Score <span className="text-yellow-400">{formatScore(stats.score)}</span>
         </span>
-        <span className="text-xs text-neutral-400">
-          Best <span className="text-neutral-200">{formatScore(stats.bestScore)}</span>
-        </span>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-neutral-400">
+            Best <span className="text-neutral-200">{formatScore(stats.bestScore)}</span>
+          </span>
+          <span className="flex items-center gap-1 text-yellow-300 font-bold bg-yellow-950/60 border border-yellow-500/30 px-1.5 py-0.2 rounded-md">
+            <Coins className="w-3 h-3 text-yellow-400" />
+            <span>{stats.totalCoins || 0}</span>
+          </span>
+        </div>
       </div>
 
       {/* Level & Power-up Status */}
@@ -67,13 +75,13 @@ export const HUD: React.FC<HUDProps> = ({
         </div>
       </div>
 
-      {/* Health Hearts & Quick Controls */}
+      {/* Health Hearts, Shop Button & Quick Controls */}
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-0.5 mr-1">
+        <div className="flex items-center gap-0.5 mr-0.5">
           {[0, 1, 2].map((idx) => (
             <Heart
               key={idx}
-              className={`w-5 h-5 transition-all ${
+              className={`w-4 h-4 sm:w-5 sm:h-5 transition-all ${
                 idx < stats.lives
                   ? 'text-red-500 fill-red-500 scale-100 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]'
                   : 'text-neutral-700 fill-neutral-800 scale-90'
@@ -81,6 +89,15 @@ export const HUD: React.FC<HUDProps> = ({
             />
           ))}
         </div>
+
+        {/* Garage / Shop Button */}
+        <button
+          onClick={onOpenShop}
+          className="p-1.5 rounded-lg bg-neutral-900 border border-yellow-500/40 hover:border-yellow-400 text-yellow-400 hover:text-yellow-300 transition active:scale-95 flex items-center gap-1 shadow-[0_0_8px_rgba(234,179,8,0.15)]"
+          title="Open Car Garage & Shop"
+        >
+          <ShoppingBag className="w-4 h-4" />
+        </button>
 
         {/* Audio Toggle */}
         <button
@@ -105,3 +122,4 @@ export const HUD: React.FC<HUDProps> = ({
     </div>
   );
 };
+

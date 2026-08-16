@@ -1,6 +1,6 @@
 {
-  "name": "Turbo Dodge",
-  "description": "High-speed retro arcade car dodging game with power-ups, screen shake, particles, sound effects, high score persistence, and mobile touch controls.",
+  "name": "Turbo Dodge 3D",
+  "description": "High-speed 3D arcade racer built with Three.js featuring dynamic 3D chase, hood, and retro camera angles, custom 3D car models (F1 open-wheel, supercharged V8 muscle, armored heavy trucks, GT supercars, zero-G hovercrafts), real-time 3D lighting and shadows, close-pass near-miss bonuses, 3D particle bursts, and synthesized Web Audio sound profiles.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -21,11 +21,19 @@ export const PwaInstallBanner: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-1.5">
+            <a
+              href="/turbo_dodge.html"
+              download="turbo_dodge.html"
+              className="px-3 py-1.5 bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 text-neutral-950 font-bold rounded-lg transition text-[11px] flex items-center gap-1"
+              title="Download standalone single HTML file"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download .HTML</span>
+            </a>
             <button
               onClick={() => setIsOpen(true)}
               className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-neutral-950 font-bold rounded-lg transition text-[11px] flex items-center gap-1"
             >
-              <Download className="w-3.5 h-3.5" />
               <span>Guide</span>
             </button>
             <button
